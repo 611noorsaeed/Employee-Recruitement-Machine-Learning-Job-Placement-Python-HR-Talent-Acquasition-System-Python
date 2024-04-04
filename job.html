@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Placement</title>
+    <!-- Add Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+     <!-- Add Bootstrap Icons library -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        .container {
+            border-radius: 15px;
+            color: black;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+        .result-container {
+            background: #000000;
+            color: #ffffff;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 15px;
+        }
+    </style>
+</head>
+
+<body>
+<!-- Navbar with attractive background and shadow effects -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container-fluid" style="background:#FCDCCB; height:70px;">
+            <a class="navbar-brand" href="#">HR Performance</a>
+            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/index" style="transition: background-color 0.3s ease;" onmouseover="this.style.backgroundColor='orange';" onmouseout="this.style.backgroundColor='transparent';"><i class="bi bi-house-door"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/job" style="transition: background-color 0.3s ease;" onmouseover="this.style.backgroundColor='orange';" onmouseout="this.style.backgroundColor='transparent';"><i class="bi bi-briefcase"></i> Recruitment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/ana" style="transition: background-color 0.3s ease;" onmouseover="this.style.backgroundColor='orange';" onmouseout="this.style.backgroundColor='transparent';"><i class="bi bi-bar-chart"></i> Dashboard</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+<!--add forms-->
+<div class="container mt-4" style="background:white; text:black; border-radius:15px; border:1px black solid">
+    <h1 class="navbar-brand text-center" style="margin-left:40%; text:bold;" href="#">Employee Requirement Details Here</h1>
+
+    <form action="/placement" method="post">
+        <div class="row">
+            <div class="col-md-6">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="sl_no">Serial Number</label>
+                            <input type="number" class="form-control" id="sl_no" name="sl_no">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="gender">Gender</label>
+                            <select class="form-control" id="gender" name="gender">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="ssc_p">SSC Percentage</label>
+                            <input type="number" class="form-control" id="ssc_p" name="ssc_p" step="0.01" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="hsc_p">HSC Percentage</label>
+                            <input type="number" class="form-control" id="hsc_p" name="hsc_p" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="degree_p">Degree Percentage</label>
+                            <input type="number" class="form-control" id="degree_p" name="degree_p" step="0.01" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="workex">Work Experience</label>
+                            <select class="form-control" id="workex" name="workex">
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="etest_p">ETest Percentage</label>
+                            <input type="number" class="form-control" id="etest_p" name="etest_p" step="0.01" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="specialisation">Specialization</label>
+                            <select class="form-control" id="specialisation" name="specialisation" required>
+                                <option value="Mkt&HR">Mkt&HR</option>
+                                <option value="Mkt&Fin">Mkt&Fin</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="mba_p">MBA Percentage</label>
+                            <input type="number" class="form-control" id="mba_p" name="mba_p" step="0.01" required>
+                        </div>
+                        <!-- Add other fields in a similar structure -->
+                    </div>
+
+            </div>
+        </div>
+
+      <button type="submit" class="btn btn-danger btn-lg" style="width:100%;">Predict</button>
+    </form>
+</div>
+
+
+
+    {% if result %}
+    <div class="result-container container">
+        <h1>{{ result }}</h1>
+        <h3>{{ rec }}</h3>
+    </div>
+    {% endif %}
+
+    <!-- Add Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
