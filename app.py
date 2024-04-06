@@ -10,33 +10,35 @@ import pandas as pd
 app = Flask(__name__)
 
 # ======================================loading models and datasets================================
-data = pd.read_csv('datasets/Placement_Data_Full_Class.csv')
-lg = pickle.load(open('models/lg.pkl','rb'))
-rfc = pickle.load(open('models/rfc.pkl','rb'))
+df = pd.read_csv('notebook/HR_comma_sep.csv.crdownload')
+model = pickle.load(open('models/model.pkl','rb'))
 scaler = pickle.load(open('models/scaler.pkl','rb'))
-df = pd.read_csv("datasets/HR_comma_sep.csv.crdownload", encoding='utf-8')
 
-
-# Dashboard plots=====================
+# ======================================dashboard functions========================================
 def reading_cleaning(df):
-    sal = {
-        'high': 3,
-        'medium': 2,
-        'low': 1,
-        'h': 3,
-    }
-
-    df['num_salary'] = df.salary.apply(lambda x: sal[x])
-    cols = df.columns.tolist()
-    cols.insert(len(cols), cols.pop(cols.index('left')))
-    df = df[cols]
-    df.columns = [x.lower() for x in cols]
     df.drop_duplicates(inplace=True)
+    cols = df.columns.tolist()
+    df.columns = [x.lower() for x in cols]
 
     return df
-
-
+#-----
 df = reading_cleaning(df)
+
+
+def employee_important_info(df):
+    # Average satisfaction level
+    average_satisfaction = df['satisfaction_level'].mean()
+    # Department-wise average satisfaction level
+    department_satisfaction = df.groupby('department')['satisfaction_level'].mean()
+    # Salary-wise average satisfaction level
+    salary_satisfaction = df.groupby('salary')['satisfaction_level'].mean()
+
+    # Employees who left
+    left_employees = len(df[df['left'] == 1])
+    # Employees who stayed
+    stayed_employees = len(df[df['left'] == 0])
+
+    return average_satisfaction, department_satisfaction, salary_satisfaction, left_employees, stayed_employees
 
 def plots(df, col):
     values = df[col].unique()
@@ -47,9 +49,9 @@ def plots(df, col):
     labels = [f'{value} ({col})' for value in values]
     plt.legend(labels=labels, loc='upper right', fontsize=12)
     plt.title(f"Distribution of {col}", fontsize=16, fontweight='bold')
-    plt.savefig('static/' + col + '.png')
-    plt.close()
 
+    plt.savefig('static/'+ col + '.png')
+    plt.close()
 
 def distribution(df, col):
     values = df[col].unique()
@@ -61,7 +63,6 @@ def distribution(df, col):
     plt.xticks(rotation=90)
     plt.savefig('static/' + col + '_distribution.png')
     plt.close()
-
 
 def comparison(df, x, y):
     plt.figure(figsize=(15, 10))
@@ -84,7 +85,6 @@ def corr_with_left(df):
     plt.savefig('static/correlation.png')
     plt.close()
 
-
 def histogram(df, col):
     fig, axes = plt.subplots(1, 2, figsize=(15, 10))  # Create a grid of 1 row and 2 columns
 
@@ -99,9 +99,6 @@ def histogram(df, col):
     plt.tight_layout()  # Adjust the layout to prevent overlapping
     plt.savefig('static/' + col + '_histogram.png')
     plt.close()
-
-
-
 
 #=====================prediction function====================================================
 def prediction(sl_no, gender, ssc_p, hsc_p, degree_p, workex, etest_p, specialisation, mba_p):
@@ -121,7 +118,7 @@ def prediction(sl_no, gender, ssc_p, hsc_p, degree_p, workex, etest_p, specialis
     data['workex'] = data['workex'].map({"Yes":1,"No":0})
     data['specialisation'] = data['specialisation'].map({"Mkt&HR":1,"Mkt&Fin":0})
     scaled_df = scaler.transform(data)
-    result = lg.predict(scaled_df).reshape(1, -1)
+    result = model.predict(scaled_df).reshape(1, -1)
     return result[0]
 
 
@@ -138,27 +135,30 @@ def home():
 def job():
     return render_template('job.html')
 
-@app.route('/ret')
-def ret():
-    return render_template('ret.html')
-
 
 @app.route('/ana')
 def ana():
-    # plots(df, 'left')
-    # plots(df, 'salary')
-    # plots(df, 'number_project')
-    # plots(df, 'department')
-    #
-    # distribution(df, 'salary')
-    # distribution(df, 'department')
-    #
-    # comparison(df, 'department', 'satisfaction_level')
-    #
-    # corr_with_left(df)
-    #
-    # histogram(df, 'satisfaction_level')
-    return render_template('ana.html', df=df)
+    average_satisfaction, department_satisfaction, salary_satisfaction, left_employees, stayed_employees= employee_important_info(df)
+    plots(df, 'left')
+    plots(df, 'salary')
+    plots(df, 'number_project')
+    plots(df, 'department')
+
+    distribution(df, 'salary')
+    distribution(df, 'department')
+
+    comparison(df, 'department', 'satisfaction_level')
+
+    corr_with_left(df)
+
+    histogram(df, 'satisfaction_level')
+
+    # Convert Series objects to dictionaries
+    department_satisfaction= department_satisfaction.to_dict()
+    salary_satisfaction = salary_satisfaction.to_dict()
+    return render_template('ana.html', df=df.head(),average_satisfaction=average_satisfaction,
+                           department_satisfaction=department_satisfaction,salary_satisfaction=salary_satisfaction,
+                           left_employees=left_employees,stayed_employees=stayed_employees)
 
 
 
